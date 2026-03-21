@@ -24,7 +24,7 @@ void construire_message(char *message, char motif, int lg, int num_msg)
     int i;
     int temp = num_msg;
 
-    // 1. Gestion des 5 premiers caractères (le numéro)
+    // Gestion des 5 premiers caractères (le numéro)
     // On part de la fin de l'en-tête (4) et on remonte jusqu'au début (0)
     for (i = 4; i >= 0; i--) 
     {
