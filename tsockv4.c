@@ -21,26 +21,30 @@ void afficher_message(char *message, int lg)
 
 void construire_message(char *message, char motif, int lg, int num_msg)
 {
-	char prefix[6];
-	int i;
+    int i;
+    int temp = num_msg;
 
-	// Ajout du motif de depart de message
-	snprintf(prefix, sizeof(prefix), "%5d", num_msg);
-	for (i = 0; i < 5; i++)
-	{
-		if (prefix[i] == ' ')
-		{
-			prefix[i] = '-';
-		}
-		message[i] = prefix[i];
-	}
-
-	// Remplissage du reste du message avec le motif
-	for (i = 5; i < lg; i++)
-	{
-		message[i] = motif;
-	}
+    // 1. Gestion des 5 premiers caractères (le numéro)
+    // On part de la fin de l'en-tête (4) et on remonte jusqu'au début (0)
+    for (i = 4; i >= 0; i--) 
+    {
+        // S'il reste des chiffres à extraire (ou si le numéro de base était 0 et qu'on est au premier tour)
+        if (temp > 0 || (i == 4 && num_msg == 0)) 
+        {
+            message[i] = (temp % 10) + '0'; // Extrait le dernier chiffre et le convertit en caractère ASCII
+            temp = temp / 10;               // Supprime le dernier chiffre pour le tour suivant
+        } 
+        else 
+        {
+            message[i] = '-'; // S'il n'y a plus de chiffres, on met un tiret
+        }
+    }
+    for (i = 5; i < lg; i++)
+    {
+        message[i] = motif;
+    }
 }
+
 
 int main(int argc, char **argv)
 {
@@ -76,7 +80,7 @@ int main(int argc, char **argv)
 	{
 		switch (c)
 		{
-		case 'p': //puit
+		case 'p': // puit
 			if (source == 1)
 			{
 				printf("usage: cmd [-p|-s][-n ##]\n");
@@ -84,20 +88,19 @@ int main(int argc, char **argv)
 			}
 			source = 0;
 			break;
-		
-		case 'r': //recepteur = puit
+
+		case 'r': // recepteur = puit
 			if (source == 1)
 			{
 				exit(1);
 			}
 			source = 0;
 			break;
-		
-		
+
 		case 'u':
 			u = 1;
 			break;
-		case 's'://source
+		case 's': // source
 			if (source == 0)
 			{
 				printf("usage: cmd [-p|-s][-n ##]\n");
@@ -106,7 +109,7 @@ int main(int argc, char **argv)
 			source = 1;
 			break;
 
-			case 'e'://emetteur = source
+		case 'e': // emetteur = source
 			if (source == 0)
 			{
 				exit(1);
@@ -174,7 +177,7 @@ int main(int argc, char **argv)
 		adr_distant.sin_family = AF_INET;
 		adr_distant.sin_port = port;
 
-		//Recuperation de l'IP correspondant au nom de domaine
+		// Recuperation de l'IP correspondant au nom de domaine
 
 		if ((IP = gethostbyname(nom)) == NULL)
 		{
@@ -188,13 +191,16 @@ int main(int argc, char **argv)
 		{
 			construire_message(M, 'a' + (i % 26), lg_M, i + 1);
 			lg_emis = sendto(sock, M, lg_M, 0, (struct sockaddr *)&adr_distant, lg_adr_distant);
-			if (lg_emis ==-1){
+			if (lg_emis == -1)
+			{
 				printf("Probleme sendto dans source UDP\n");
 			}
-			if (lg_emis ==0){
-				printf("SOURCE: Envoi n°%d le message n'a pas été envoyé car la taille est de 0 \n",i+1);
+			if (lg_emis == 0)
+			{
+				printf("SOURCE: Envoi n°%d le message n'a pas été envoyé car la taille est de 0 \n", i + 1);
 			}
-			else {
+			else
+			{
 				printf("SOURCE: Envoi n°%d (%d) [%.*s]\n", i + 1, lg_M, lg_M, M);
 			}
 		}
@@ -235,21 +241,23 @@ int main(int argc, char **argv)
 			construire_message(M, 'a' + (i % 26), lg_M, i + 1);
 			// ou send(sock, M, lg_M, 0) mais pas sendto car pour UDP code de la V1 inutile ici
 			lg_emis = write(sock, M, lg_M);
-			if (lg_emis==-1){
+			if (lg_emis == -1)
+			{
 				printf("Erreur write dans source TCP \n");
 			}
-			if (lg_emis==0){
+			if (lg_emis == 0)
+			{
 				printf("SOURCE: Envoi n°%d n'a envoyé aucun message \n", i + 1);
 			}
 			printf("SOURCE: Envoi n°%d (%d) [%.*s]\n", i + 1, lg_M, lg_M, M);
 		}
 		printf("SOURCE: fin\n");
 
-		if (shutdown(sock, 1) == -1) //fin de connexion car plus de msg à envoyé
+		if (shutdown(sock, 1) == -1) // fin de connexion car plus de msg à envoyé
 		{
 			printf("Probleme fin de connexion dans la source\n");
 		}
-		close(sock); //destruction du socket
+		close(sock); // destruction du socket
 	}
 
 	//--------------PUITS SOUS UDP------------------------------------------
@@ -286,7 +294,8 @@ int main(int argc, char **argv)
 		while (nb_message == -1 || nb_m <= nb_message)
 		{
 			lu = recvfrom(sock, pmesg, lg_M, 0, (struct sockaddr *)&adr_distant, &lg_adr_distant);
-			if (lu ==-1){
+			if (lu == -1)
+			{
 				printf("Erreur dans le puit de udp a cause de recvfrom \n");
 			}
 			if (lu > 0)
@@ -343,8 +352,8 @@ int main(int argc, char **argv)
 			case -1:
 				// ERREUR
 				printf("echec du fork\n");
-				shutdown(sock_bis, 0); //ferme la connexion
-				close(sock_bis);//detruit le socket
+				shutdown(sock_bis, 0); // ferme la connexion
+				close(sock_bis);	   // detruit le socket
 				break;
 
 			case 0:
