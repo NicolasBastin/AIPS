@@ -144,7 +144,7 @@ int main(int argc, char **argv)
 			if (argc > (optind + 1))
 			// donc second argument non option
 			{
-				port = htons((atoi(argv[optind + 1]));
+				port = htons((atoi(argv[optind + 1])));
 			}
 		}
 		else
