@@ -8,7 +8,7 @@ executer avec UDP puits :
 ./tsockv4 -u -r -n 15 -l 5 9000
 
 executer avec UDP source :
-./tsockv4 -u -e -n 15 -l 50 dumas 9000
+./tsockv4 -u -e -n 15 -l 50 localhost 9000
 
 executer avec TCP puits :
 ./tsockv4 -r -n 15 -l 5 9000
