@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 	int lus = 0; // nbr message lu avec methode pere/fil
 	// Variable par default si pas defini dans les parametres
 	char *nom = "localhost";
-	int port = 9000;
+	int port = htons(9000); //Utilisation de htons car demandé dns le compte rendu du tp
 
 	// Recuperation des options rentrées en entrees de la fonction
 
@@ -144,12 +144,12 @@ int main(int argc, char **argv)
 			if (argc > (optind + 1))
 			// donc second argument non option
 			{
-				port = atoi(argv[optind + 1]);
+				port = htons((atoi(argv[optind + 1]));
 			}
 		}
 		else
 		{ // le premier argument non option est le port donc pas de nom
-			port = atoi(argv[optind]);
+			port = htons(atoi(argv[optind]));
 		}
 	}
 	// Emplacement initial des fonctions permettant de verifier si on est en source / puit etc
@@ -175,7 +175,7 @@ int main(int argc, char **argv)
 		/* reset de la structure */
 		memset((char *)&adr_distant, 0, sizeof(adr_distant));
 		adr_distant.sin_family = AF_INET;
-		adr_distant.sin_port = port;
+		adr_distant.sin_port = htons(port);
 
 		// Recuperation de l'IP correspondant au nom de domaine
 
@@ -186,7 +186,7 @@ int main(int argc, char **argv)
 		}
 		memcpy((char *)&(adr_distant.sin_addr.s_addr), IP->h_addr, IP->h_length);
 		// Construction du message puis envoie d'icelui
-		printf("SOURCE: lg_mesg_emis=%d, port=%d, nb_envois=%d, TP=udp, dest=%s\n", lg_M, port, nb_message, nom);
+		printf("SOURCE: lg_mesg_emis=%d, port=%d, nb_envois=%d, TP=udp, dest=%s\n", lg_M, htons(port), nb_message, nom);
 		for (int i = 0; i < nb_message; i++)
 		{
 			construire_message(M, 'a' + (i % 26), lg_M, i + 1);
@@ -218,7 +218,7 @@ int main(int argc, char **argv)
 		// init et reset de la structure
 		memset((char *)&adr_distant, 0, sizeof(adr_distant));
 		adr_distant.sin_family = AF_INET;
-		adr_distant.sin_port = port;
+		adr_distant.sin_port = htons(port);
 		// recuperation de l'IP avec le nom de domaine
 		if ((IP = gethostbyname(nom)) == NULL)
 		{
@@ -234,7 +234,7 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 
-		printf("SOURCE: lg_mesg_emis=%d, port=%d, nb_envois=%d, TP=tcp, dest=%s\n", lg_M, port, nb_message, nom);
+		printf("SOURCE: lg_mesg_emis=%d, port=%d, nb_envois=%d, TP=tcp, dest=%s\n", lg_M, htons(port), nb_message, nom);
 
 		for (int i = 0; i < nb_message; i++)
 		{ // construit msg et change le caractere
@@ -276,7 +276,7 @@ int main(int argc, char **argv)
 
 		memset((char *)&adr_local, 0, sizeof(adr_local)); // init et reset la structure
 		adr_local.sin_family = AF_INET;
-		adr_local.sin_port = port;
+		adr_local.sin_port = htons(port);
 		adr_local.sin_addr.s_addr = INADDR_ANY;
 		// association adresse socket
 		if (bind(sock, (struct sockaddr *)&adr_local, lg_adr_local) == -1)
@@ -310,9 +310,9 @@ int main(int argc, char **argv)
 	if (source == 0 && u == 0)
 	{
 		if (nb_message == -1)
-			printf("PUITS: lg_mesg-lu=%d, port=%d, nb_receptions=infini, TP=tcp\n", lg_M, port);
+			printf("PUITS: lg_mesg-lu=%d, port=%d, nb_receptions=infini, TP=tcp\n", lg_M, htons(port));
 		else
-			printf("PUITS: lg_mesg-lu=%d, port=%d, nb_receptions=%d, TP=tcp\n", lg_M, port, nb_message);
+			printf("PUITS: lg_mesg-lu=%d, port=%d, nb_receptions=%d, TP=tcp\n", lg_M, htons(port), nb_message);
 		// creation socket pour puits
 		if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		{
@@ -322,7 +322,7 @@ int main(int argc, char **argv)
 
 		memset((char *)&adr_local, 0, sizeof(adr_local)); // init et reset la structure
 		adr_local.sin_family = AF_INET;
-		adr_local.sin_port = port;
+		adr_local.sin_port = htons(port);
 		adr_local.sin_addr.s_addr = INADDR_ANY;
 
 		// association adresse socket
