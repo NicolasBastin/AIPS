@@ -1,22 +1,24 @@
 Bastin Nicolas
 Bedour Clément
 
-gcc tsock_v3.c -o tsock_v3
+Compiler le .c
+gcc tsock_v4.c -o tsock_v4 
 
 executer avec UDP puits :
-./tsock_v3 -u -p -n 15 -l 5 9000
+./tsock_v3 -u -r -n 15 -l 5 9000
 
 executer avec UDP source :
-./tsock_v3 -u -s -n 15 -l 50 dumas 9000
+./tsock_v3 -u -e -n 15 -l 50 dumas 9000
 
 executer avec TCP puits :
-./tsock_v3 -p -n 15 -l 5 9000
+./tsock_v3 -r -n 15 -l 5 9000
 
 executer avec TCP source :
-./tsock_v3 -s -n 15 -l 50 localhost 9000
+./tsock_v3 -e -n 15 -l 50 localhost 9000
 
 Nous avons toujours UDP de fonctionnel.
-Nous avons maintenant TCP également fonctionnel.
+Nous avons tuojours TCP fonctionnel.
+Nous avons fait la version 4, qui ajoute la création de nouveau processus pour le serveur ce qui lui permet d'être à l'écoute de nouuvelle connexion constamment.
+Nous avons aussi ajouter les options -r -e
 
-Nous avons rendu le code plus "générique", ajout de l'option pour le nom de domaine et le numéro de port.
 Nous avons mis le format des messages voulu.
